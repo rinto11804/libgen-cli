@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"libgen/fetch"
 	"libgen/pretty"
 	"log"
@@ -19,9 +20,12 @@ func main() {
 		Query: args[1],
 	}
 	books, err := fetch.Search(opt)
+	fmt.Println(books)
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	pretty.TablePrinter(books)
+	selectedBook := Draw(books)
+	Downloader(selectedBook)
 }

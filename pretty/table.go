@@ -20,10 +20,15 @@ func TablePrinter(books []*fetch.Book) {
 		blue.Println(lines)
 		m.Print(b.ID)
 		print(tabs, b.Title, "\n")
-		println(tabs, tabs, "@author", b.Author, tabs, "@year", b.Year, tabs, "@edition", b.Edition, tabs, "@", b.Extention)
+		println(tabs, b.Author, tabs, b.Year, tabs, b.Edition, tabs, b.Extention)
+		println(b.MD5)
 		blue.Println(lines)
-		time.Sleep(time.Second * 1 / 2)
-
+		time.Sleep(time.Second * 1 / 3)
 	}
-
+}
+func SelectorArrow(books []*fetch.Book) *fetch.Book {
+	for _, b := range books {
+		m.Print("* ", b.Title, "\n")
+	}
+	return nil
 }
