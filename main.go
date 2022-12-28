@@ -12,13 +12,12 @@ import (
 func main() {
 	args := os.Args
 	if len(args) != 2 {
-		color.Red("Please enter a book name")
+		color.Red("provide a book name")
 		return
 	}
-	opt := &cmd.SearchOpt{
+	books, err := cmd.Search(&cmd.SearchOpt{
 		Query: args[1],
-	}
-	books, err := cmd.Search(opt)
+	})
 	if err != nil {
 		log.Println(err)
 		return
@@ -28,5 +27,4 @@ func main() {
 	if selectedBook != nil {
 		cmd.Downloader(selectedBook)
 	}
-
 }

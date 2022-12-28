@@ -19,20 +19,18 @@ const (
 )
 
 type Book struct {
-	ID          string
-	Title       string
-	Author      string
-	Publisher   string
-	Year        string
-	Pages       string
-	MD5         string
-	Language    string
-	Edition     string
-	FileSize    string
-	Extention   string
-	CoverUrl    string
-	DownloadUrl string
-	Selected    bool
+	ID        string
+	Title     string
+	Author    string
+	Publisher string
+	Year      string
+	Pages     string
+	MD5       string
+	Language  string
+	Edition   string
+	FileSize  string
+	Extention string
+	CoverUrl  string
 }
 
 type SearchOpt struct {
@@ -52,15 +50,7 @@ type Detailes struct {
 }
 
 func Search(options *SearchOpt) ([]*Book, error) {
-	var r int
-	switch {
-	case options.Results <= 25:
-		r = 25
-	case options.Results <= 50:
-		r = 50
-	default:
-		r = 25
-	}
+	options.Results = 25
 	options.SearchMirror.Scheme = "https"
 	options.SearchMirror.Host = host
 	options.SearchMirror.Path = "search.php"
@@ -69,7 +59,7 @@ func Search(options *SearchOpt) ([]*Book, error) {
 	q.Set("lg_topic", "libgen")
 	q.Set("open", "0")
 	q.Set("view", "simple")
-	q.Set("res", fmt.Sprint(r))
+	q.Set("res", fmt.Sprint(options.Results))
 	q.Set("phrase", "1")
 	q.Set("column", "def")
 	options.SearchMirror.RawQuery = q.Encode()
@@ -97,7 +87,7 @@ func getBody(url string) ([]byte, error) {
 	}
 	res, err := client.Get(url)
 	if err != nil {
-		return nil, fmt.Errorf("Cant connect to %s error %s", url, err)
+		return nil, fmt.Errorf("Cant connect to %s error %s", host, err)
 	}
 
 	if res.StatusCode != http.StatusOK {
@@ -128,7 +118,11 @@ func hashParser(res []byte) string {
 func getDetailes(hashes string) ([]*Book, error) {
 	var books []*Book
 	opt := &SearchOpt{
-		SearchMirror: url.URL{Scheme: "https", Host: host, Path: "json.php"},
+		SearchMirror: url.URL{
+			Scheme: "https",
+			Host:   host,
+			Path:   "json.php",
+		},
 	}
 	q := opt.SearchMirror.Query()
 	q.Set("ids", hashes)
