@@ -1,21 +1,19 @@
-package main
+package pretty
 
 import (
 	"fmt"
-	"libgen/fetch"
+	"libgen/cmd"
 	"strings"
 
 	"github.com/manifoldco/promptui"
 )
 
-func Draw(books []*fetch.Book) *fetch.Book {
-	var selected *fetch.Book
+func Draw(books []*cmd.Book) *cmd.Book {
 	searcher := func(input string, index int) bool {
 		for _, book := range books {
 			name := strings.Replace(strings.ToLower(book.Title), " ", "", -1)
 			input = strings.Replace(strings.ToLower(input), " ", "", -1)
 			if strings.Contains(name, input) {
-				selected = book
 				return true
 			}
 		}
@@ -32,13 +30,16 @@ func Draw(books []*fetch.Book) *fetch.Book {
 		Items:    titles,
 	}
 
-	i, _, err := prompt.Run()
-
+	_, title, err := prompt.Run()
 	if err != nil {
 		fmt.Printf("Prompt failed %v\n", err)
 		return nil
 	}
+	for _, book := range books {
+		if strings.Contains(title, book.Title) {
+			return book
+		}
+	}
 
-	fmt.Printf("You choose number %d: %s\n", i+1, books[i].Title)
-	return selected
+	return nil
 }

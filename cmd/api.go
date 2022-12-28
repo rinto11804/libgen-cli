@@ -1,4 +1,4 @@
-package fetch
+package cmd
 
 import (
 	"crypto/tls"
