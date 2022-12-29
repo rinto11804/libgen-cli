@@ -1,14 +1,10 @@
-package fetch
+package cmd
 
 import (
-	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io"
-	"net/http"
 	"net/url"
 	"regexp"
-	"time"
 )
 
 const (
@@ -19,20 +15,18 @@ const (
 )
 
 type Book struct {
-	ID          string
-	Title       string
-	Author      string
-	Publisher   string
-	Year        string
-	Pages       string
-	MD5         string
-	Language    string
-	Edition     string
-	FileSize    string
-	Extention   string
-	CoverUrl    string
-	DownloadUrl string
-	Selected    bool
+	ID        string
+	Title     string
+	Author    string
+	Publisher string
+	Year      string
+	Pages     string
+	MD5       string
+	Language  string
+	Edition   string
+	FileSize  string
+	Extention string
+	CoverUrl  string
 }
 
 type SearchOpt struct {
@@ -52,15 +46,7 @@ type Detailes struct {
 }
 
 func Search(options *SearchOpt) ([]*Book, error) {
-	var r int
-	switch {
-	case options.Results <= 25:
-		r = 25
-	case options.Results <= 50:
-		r = 50
-	default:
-		r = 25
-	}
+	options.Results = 25
 	options.SearchMirror.Scheme = "https"
 	options.SearchMirror.Host = host
 	options.SearchMirror.Path = "search.php"
@@ -69,7 +55,7 @@ func Search(options *SearchOpt) ([]*Book, error) {
 	q.Set("lg_topic", "libgen")
 	q.Set("open", "0")
 	q.Set("view", "simple")
-	q.Set("res", fmt.Sprint(r))
+	q.Set("res", fmt.Sprint(options.Results))
 	q.Set("phrase", "1")
 	q.Set("column", "def")
 	options.SearchMirror.RawQuery = q.Encode()
@@ -87,32 +73,6 @@ func Search(options *SearchOpt) ([]*Book, error) {
 	return books, nil
 }
 
-func getBody(url string) ([]byte, error) {
-	client := http.Client{
-		Timeout: time.Second * 15,
-		Transport: &http.Transport{
-			Proxy:           http.ProxyFromEnvironment,
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-		},
-	}
-	res, err := client.Get(url)
-	if err != nil {
-		return nil, fmt.Errorf("Cant connect to %s error %s", url, err)
-	}
-
-	if res.StatusCode != http.StatusOK {
-		return nil, fmt.Errorf("http returned witn status code %s", res.Status)
-	}
-
-	b, err := io.ReadAll(res.Body)
-	if err != nil {
-		return nil, err
-	}
-
-	defer res.Body.Close()
-	return b, nil
-}
-
 func hashParser(res []byte) string {
 	var hashes string = ""
 	re := regexp.MustCompile(searchHref)
@@ -128,7 +88,11 @@ func hashParser(res []byte) string {
 func getDetailes(hashes string) ([]*Book, error) {
 	var books []*Book
 	opt := &SearchOpt{
-		SearchMirror: url.URL{Scheme: "https", Host: host, Path: "json.php"},
+		SearchMirror: url.URL{
+			Scheme: "https",
+			Host:   host,
+			Path:   "json.php",
+		},
 	}
 	q := opt.SearchMirror.Query()
 	q.Set("ids", hashes)

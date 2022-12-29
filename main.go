@@ -1,7 +1,7 @@
 package main
 
 import (
-	"libgen/fetch"
+	"libgen/cmd"
 	"libgen/pretty"
 	"log"
 	"os"
@@ -12,16 +12,20 @@ import (
 func main() {
 	args := os.Args
 	if len(args) != 2 {
-		color.Red("Please enter a book name")
+		color.Red("provide a book name")
 		return
 	}
-	opt := &fetch.SearchOpt{
+	books, err := cmd.Search(&cmd.SearchOpt{
 		Query: args[1],
-	}
-	books, err := fetch.Search(opt)
+	})
 	if err != nil {
 		log.Println(err)
 		return
 	}
 	pretty.TablePrinter(books)
+	selectedBook := pretty.Draw(books)
+	if selectedBook != nil {
+		err := cmd.Downloader(selectedBook)
+		log.Println(err)
+	}
 }
