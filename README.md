@@ -1,2 +1,2 @@
 # libgen-cli
-For just educational purpose 
+just for educational purpose 
