@@ -5,12 +5,10 @@ import (
 	"fmt"
 	"io"
 	"net/http"
-	"time"
 )
 
 func getBody(url string) ([]byte, error) {
 	client := http.Client{
-		Timeout: time.Second * 15,
 		Transport: &http.Transport{
 			Proxy:           http.ProxyFromEnvironment,
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},

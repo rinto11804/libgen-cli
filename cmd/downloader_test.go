@@ -22,7 +22,13 @@ var book = &Book{
 }
 
 func TestGetUrlDownloader(t *testing.T) {
-	g, _ := getDownloadURL(book)
-	t.Log(g)
+	g, err := getDownloadURL(book)
+	if err != nil {
+		t.Error(err)
+	}
+	if g != "http://62.182.86.140/main/2707000/492ca877873f8eac74f8a3a923c8feef/Mark%20Volkmann%20-%20Svelte%20and%20Sapper%20in%20Action-Manning%20Publications%20%282020%29.pdf" {
+		t.Error("Not download url")
+
+	}
 
 }

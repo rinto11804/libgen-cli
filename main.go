@@ -25,6 +25,7 @@ func main() {
 	pretty.TablePrinter(books)
 	selectedBook := pretty.Draw(books)
 	if selectedBook != nil {
-		cmd.Downloader(selectedBook)
+		err := cmd.Downloader(selectedBook)
+		log.Println(err)
 	}
 }
