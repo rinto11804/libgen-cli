@@ -24,6 +24,8 @@ func main() {
 	selectedBook := pretty.Draw(books)
 	if selectedBook != nil {
 		err := cmd.Downloader(selectedBook)
-		fmt.Println(err)
+		if err != nil {
+			fmt.Println(err)
+		}
 	}
 }

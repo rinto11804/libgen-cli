@@ -10,13 +10,9 @@ import (
 )
 
 func Draw(books []*cmd.Book) *cmd.Book {
-
 	selectedIndex := 0
-
 	reader := bufio.NewReader(os.Stdin)
-
 	for {
-
 		fmt.Print("\033[H\033[J")
 		fmt.Println("Enter j for down, k for up and ok for selection")
 		for i, book := range books {
@@ -27,10 +23,8 @@ func Draw(books []*cmd.Book) *cmd.Book {
 			}
 			fmt.Println(book.Title)
 		}
-
 		input, _ := reader.ReadString('\n')
 		input = strings.TrimRightFunc(input, unicode.IsSpace)
-
 		if input == "k" {
 			selectedIndex--
 			if selectedIndex < 0 {
@@ -45,4 +39,5 @@ func Draw(books []*cmd.Book) *cmd.Book {
 			return books[selectedIndex]
 		}
 	}
+
 }
