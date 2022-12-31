@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	host       = "libgen.is"
-	searchHref = "<a href='book.index.php.+</a>"
-	searchMD5  = "[a-zA-Z0-9]{32}"
-	fields     = "id,title,author,filesize,extension,md5,year,language,pages,publisher,edition,coverurl"
+	Host       = "libgen.is"
+	SearchHref = "<a href='book.index.php.+</a>"
+	SearchMD5  = "[a-zA-Z0-9]{32}"
+	Fields     = "id,title,author,filesize,extension,md5,year,language,pages,publisher,edition,coverurl"
 )
 
 type Book struct {
@@ -30,15 +30,9 @@ type Book struct {
 }
 
 type SearchOpt struct {
-	Query         string
-	SearchMirror  url.URL
-	Results       int
-	Print         bool
-	RequireAuthor bool
-	Extention     []string
-	Year          int
-	Publisher     string
-	Language      string
+	Query        string
+	SearchMirror url.URL
+	Results      int
 }
 
 type Detailes struct {
@@ -48,7 +42,7 @@ type Detailes struct {
 func Search(options *SearchOpt) ([]*Book, error) {
 	options.Results = 25
 	options.SearchMirror.Scheme = "https"
-	options.SearchMirror.Host = host
+	options.SearchMirror.Host = Host
 	options.SearchMirror.Path = "search.php"
 	q := options.SearchMirror.Query()
 	q.Set("req", options.Query)
@@ -75,11 +69,11 @@ func Search(options *SearchOpt) ([]*Book, error) {
 
 func hashParser(res []byte) string {
 	var hashes string = ""
-	re := regexp.MustCompile(searchHref)
+	re := regexp.MustCompile(SearchHref)
 	matches := re.FindAllString(string(res), -1)
 
 	for _, m := range matches {
-		re := regexp.MustCompile(searchMD5)
+		re := regexp.MustCompile(SearchMD5)
 		hashes = hashes + re.FindString(m) + ","
 	}
 	return hashes
@@ -90,13 +84,13 @@ func getDetailes(hashes string) ([]*Book, error) {
 	opt := &SearchOpt{
 		SearchMirror: url.URL{
 			Scheme: "https",
-			Host:   host,
+			Host:   Host,
 			Path:   "json.php",
 		},
 	}
 	q := opt.SearchMirror.Query()
 	q.Set("ids", hashes)
-	q.Set("fields", fields)
+	q.Set("fields", Fields)
 	opt.SearchMirror.RawQuery = q.Encode()
 
 	res, err := getBody(opt.SearchMirror.String())
@@ -119,7 +113,7 @@ func getDetailes(hashes string) ([]*Book, error) {
 			Language:  responce[i]["language"],
 			Extention: responce[i]["extension"],
 			FileSize:  responce[i]["filesize"],
-			CoverUrl:  host + "/" + responce[i]["coverurl"],
+			CoverUrl:  Host + "/" + responce[i]["coverurl"],
 		}
 		books = append(books, book)
 

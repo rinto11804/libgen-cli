@@ -1,45 +1,48 @@
 package pretty
 
 import (
+	"bufio"
 	"fmt"
 	"libgen/cmd"
+	"os"
 	"strings"
-
-	"github.com/manifoldco/promptui"
+	"unicode"
 )
 
 func Draw(books []*cmd.Book) *cmd.Book {
-	searcher := func(input string, index int) bool {
-		for _, book := range books {
-			name := strings.Replace(strings.ToLower(book.Title), " ", "", -1)
-			input = strings.Replace(strings.ToLower(input), " ", "", -1)
-			if strings.Contains(name, input) {
-				return true
+
+	selectedIndex := 0
+
+	reader := bufio.NewReader(os.Stdin)
+
+	for {
+
+		fmt.Print("\033[H\033[J")
+		fmt.Println("Enter j for down, k for up and ok for selection")
+		for i, book := range books {
+			if i == selectedIndex {
+				fmt.Print("--> ")
+			} else {
+				fmt.Print("    ")
 			}
+			fmt.Println(book.Title)
 		}
-		return false
-	}
-	var titles []string
-	for _, book := range books {
-		titles = append(titles, book.Title)
-	}
 
-	prompt := promptui.Select{
-		Label:    "Title selector",
-		Searcher: searcher,
-		Items:    titles,
-	}
+		input, _ := reader.ReadString('\n')
+		input = strings.TrimRightFunc(input, unicode.IsSpace)
 
-	_, title, err := prompt.Run()
-	if err != nil {
-		fmt.Printf("Prompt failed %v\n", err)
-		return nil
-	}
-	for _, book := range books {
-		if strings.Contains(title, book.Title) {
-			return book
+		if input == "k" {
+			selectedIndex--
+			if selectedIndex < 0 {
+				selectedIndex = len(books) - 1
+			}
+		} else if input == "j" {
+			selectedIndex++
+			if selectedIndex >= len(books) {
+				selectedIndex = 0
+			}
+		} else if input == "ok" {
+			return books[selectedIndex]
 		}
 	}
-
-	return nil
 }

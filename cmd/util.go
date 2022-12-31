@@ -8,15 +8,15 @@ import (
 )
 
 func getBody(url string) ([]byte, error) {
-	client := http.Client{
+	c := http.Client{
 		Transport: &http.Transport{
 			Proxy:           http.ProxyFromEnvironment,
 			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 		},
 	}
-	res, err := client.Get(url)
+	res, err := c.Get(url)
 	if err != nil {
-		return nil, fmt.Errorf("Cant connect to %s error %s", host, err)
+		return nil, fmt.Errorf("Cant connect to %s error %s", Host, err)
 	}
 
 	if res.StatusCode != http.StatusOK {
